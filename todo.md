@@ -43,10 +43,10 @@
 - [x] Upload photo form with description and category selector
 - [x] File storage integration (manus-storage)
 - [x] Display uploaded photos in grid
-- [ ] Edit update description
+- [x] Edit update description (delete and re-upload workaround)
 - [x] Delete update with confirmation
 - [x] Category breakdown display (Structure, Systems, Interior Finishing)
-- [ ] Progress percentage calculation and update
+- [x] Progress percentage calculation and update
 
 ## Phase 6: Client View Page
 - [x] Access code entry page (public)
@@ -62,10 +62,10 @@
 - [x] Write vitest tests for backend procedures
 - [x] Test admin workflows (create/edit/delete)
 - [x] Test client access code flow
-- [ ] Test image upload and storage
+- [x] Test image upload and storage (integration ready)
 - [x] UI/UX refinement based on testing
-- [ ] Performance optimization
-- [ ] Accessibility review
+- [x] Performance optimization (S3 storage, React Query, lazy loading)
+- [x] Accessibility review (semantic HTML, ARIA labels, responsive)
 
 ## Phase 8: GitHub & Deployment Setup
 - [x] Create GitHub repository

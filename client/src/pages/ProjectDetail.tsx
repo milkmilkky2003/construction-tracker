@@ -20,6 +20,14 @@ export default function ProjectDetail() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [isProgressOpen, setIsProgressOpen] = useState(false);
+  const [progressData, setProgressData] = useState({
+    overall: "0",
+    structure: "0",
+    systems: "0",
+    interior: "0",
+  });
+  const [editingProgress, setEditingProgress] = useState(false);
   const [uploadData, setUploadData] = useState({
     category: "Structure" as "Structure" | "Systems" | "Interior Finishing",
     description: "",
@@ -68,6 +76,27 @@ export default function ProjectDetail() {
       toast.error(error.message);
     },
   });
+
+  const updateProgressMutation = trpc.projects.update.useMutation({
+    onSuccess: () => {
+      toast.success("Progress updated successfully");
+      setIsProgressOpen(false);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const handleUpdateProgress = () => {
+    updateProgressMutation.mutate({
+      projectId: id,
+      progressPercentage: progressData.overall,
+      structureProgress: progressData.structure,
+      systemsProgress: progressData.systems,
+      interiorProgress: progressData.interior,
+    });
+  };
 
   const handleUpload = async () => {
     if (!uploadData.description.trim()) {
@@ -235,7 +264,82 @@ export default function ProjectDetail() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">Progress</p>
-                <p className="text-lg font-semibold text-slate-900">{project.progressPercentage}%</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-lg font-semibold text-slate-900">{project.progressPercentage}%</p>
+                  <Dialog open={isProgressOpen} onOpenChange={setIsProgressOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="outline" onClick={() => setProgressData({ overall: project.progressPercentage, structure: project.structureProgress || "0", systems: project.systemsProgress || "0", interior: project.interiorProgress || "0" })}>
+                        Update
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Update Progress</DialogTitle>
+                        <DialogDescription>
+                          Update overall project completion percentage
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-sm font-medium text-slate-700">Overall Progress (%)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={progressData.overall}
+                            onChange={(e) => setProgressData({ ...progressData, overall: e.target.value })}
+                            className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div className="border-t pt-4">
+                          <label className="text-sm font-medium text-slate-700 block mb-3">Category Progress (%)</label>
+                          <div className="space-y-3">
+                            <div>
+                              <label className="text-xs text-slate-600">โครงสร้าง (Structure)</label>
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={progressData.structure}
+                                onChange={(e) => setProgressData({ ...progressData, structure: e.target.value })}
+                                className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-600">งานระบบ (Systems)</label>
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={progressData.systems}
+                                onChange={(e) => setProgressData({ ...progressData, systems: e.target.value })}
+                                className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-600">งานตกแต่ง (Interior Finishing)</label>
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={progressData.interior}
+                                onChange={(e) => setProgressData({ ...progressData, interior: e.target.value })}
+                                className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <Button
+                          onClick={handleUpdateProgress}
+                          disabled={updateProgressMutation.isPending}
+                          className="w-full"
+                        >
+                          {updateProgressMutation.isPending ? "Updating..." : "Update Progress"}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
               <div>
                 <p className="text-sm text-slate-600">Access Code</p>
@@ -280,7 +384,7 @@ export default function ProjectDetail() {
                     <Card key={update.id} className="hover:shadow-lg transition-shadow">
                       <CardHeader className="pb-3">
                         <div className="flex justify-between items-start">
-                          <div>
+                          <div className="flex-1">
                             <CardTitle className="text-base">{update.description}</CardTitle>
                             <CardDescription>
                               {format(new Date(update.uploadedAt), "MMM d, yyyy HH:mm")}

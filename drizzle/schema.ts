@@ -39,6 +39,9 @@ export const projects = mysqlTable("projects", {
   endDate: timestamp("endDate"),
   accessCode: varchar("accessCode", { length: 12 }).notNull().unique(), // Unique code for client access
   progressPercentage: decimal("progressPercentage", { precision: 5, scale: 2 }).default("0").notNull(),
+  structureProgress: decimal("structureProgress", { precision: 5, scale: 2 }).default("0").notNull(),
+  systemsProgress: decimal("systemsProgress", { precision: 5, scale: 2 }).default("0").notNull(),
+  interiorProgress: decimal("interiorProgress", { precision: 5, scale: 2 }).default("0").notNull(),
   isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

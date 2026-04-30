@@ -75,6 +75,9 @@ export const projectsRouter = router({
         startDate: z.date().optional(),
         endDate: z.date().optional(),
         progressPercentage: z.string().optional(),
+        structureProgress: z.string().optional(),
+        systemsProgress: z.string().optional(),
+        interiorProgress: z.string().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -87,6 +90,9 @@ export const projectsRouter = router({
         startDate: input.startDate,
         endDate: input.endDate,
         progressPercentage: input.progressPercentage,
+        structureProgress: input.structureProgress,
+        systemsProgress: input.systemsProgress,
+        interiorProgress: input.interiorProgress,
       });
       return { success: true };
     }),
