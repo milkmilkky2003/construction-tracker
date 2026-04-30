@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, projects, projectUpdates, updateImages, InsertProject, InsertProjectUpdate, InsertUpdateImage } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,88 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Projects queries
+export async function getProjectsByOwner(ownerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(projects).where(eq(projects.ownerId, ownerId));
+}
+
+export async function getProjectByAccessCode(accessCode: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(projects).where(eq(projects.accessCode, accessCode)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getProjectById(projectId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(projects).where(eq(projects.id, projectId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createProject(data: InsertProject) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(projects).values(data);
+  return result;
+}
+
+export async function updateProject(projectId: number, data: Partial<InsertProject>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.update(projects).set(data).where(eq(projects.id, projectId));
+}
+
+export async function deleteProject(projectId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.delete(projects).where(eq(projects.id, projectId));
+}
+
+// Project Updates queries
+export async function getProjectUpdates(projectId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(projectUpdates).where(eq(projectUpdates.projectId, projectId));
+}
+
+export async function getProjectUpdateWithImages(updateId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const update = await db.select().from(projectUpdates).where(eq(projectUpdates.id, updateId)).limit(1);
+  if (update.length === 0) return undefined;
+  const images = await db.select().from(updateImages).where(eq(updateImages.updateId, updateId));
+  return { ...update[0], images };
+}
+
+export async function createProjectUpdate(data: InsertProjectUpdate) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(projectUpdates).values(data);
+  return result;
+}
+
+export async function deleteProjectUpdate(updateId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  // Delete associated images first
+  await db.delete(updateImages).where(eq(updateImages.updateId, updateId));
+  return db.delete(projectUpdates).where(eq(projectUpdates.id, updateId));
+}
+
+// Update Images queries
+export async function createUpdateImage(data: InsertUpdateImage) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(updateImages).values(data);
+}
+
+export async function getUpdateImages(updateId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(updateImages).where(eq(updateImages.updateId, updateId));
+}
+
+// TODO: add more feature queries here as your schema grows.
