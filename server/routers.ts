@@ -3,9 +3,11 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { projectsRouter } from "./routers/projects";
+import { z } from "zod";
+import { getAdminByUsername } from "./db";
+import bcrypt from "bcryptjs";
 
 export const appRouter = router({
-    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -16,6 +18,32 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    adminLogin: publicProcedure
+      .input(z.object({
+        username: z.string().min(1),
+        password: z.string().min(1),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const admin = await getAdminByUsername(input.username);
+        if (!admin) {
+          throw new Error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+        }
+
+        const passwordMatch = await bcrypt.compare(input.password, admin.passwordHash);
+        if (!passwordMatch) {
+          throw new Error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+        }
+
+        // Set admin session cookie
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, JSON.stringify({ adminId: admin.id, username: admin.username }), cookieOptions);
+
+        return {
+          success: true,
+          adminId: admin.id,
+          username: admin.username,
+        };
+      }),
   }),
   projects: projectsRouter,
 });

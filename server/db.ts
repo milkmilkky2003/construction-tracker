@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, projects, projectUpdates, updateImages, InsertProject, InsertProjectUpdate, InsertUpdateImage } from "../drizzle/schema";
+import { InsertUser, users, projects, projectUpdates, updateImages, InsertProject, InsertProjectUpdate, InsertUpdateImage, adminCredentials, InsertAdminCredential } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -171,6 +171,20 @@ export async function getUpdateImages(updateId: number) {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(updateImages).where(eq(updateImages.updateId, updateId));
+}
+
+// Admin credentials queries
+export async function getAdminByUsername(username: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(adminCredentials).where(eq(adminCredentials.username, username)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createAdminCredential(data: InsertAdminCredential) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(adminCredentials).values(data);
 }
 
 // TODO: add more feature queries here as your schema grows.

@@ -45,7 +45,7 @@ export default function Home() {
                 </Button>
               </>
             ) : (
-              <Button onClick={() => (window.location.href = getLoginUrl())} className="bg-orange-600 hover:bg-orange-700">
+              <Button onClick={() => setLocation("/admin/login")} className="bg-orange-600 hover:bg-orange-700">
                 เข้าสู่ระบบ Admin
               </Button>
             )}
