@@ -152,14 +152,14 @@ export const projectsRouter = router({
       if (project.ownerId !== ctx.user.id) throw new Error("Unauthorized");
 
       // Create project update
-      const updateResult = await createProjectUpdate({
+      const update = await createProjectUpdate({
         projectId: input.projectId,
         category: input.category,
         description: input.description,
         uploadedAt: new Date(),
       });
 
-      const updateId = (updateResult as any).insertId;
+      const updateId = update.id;
 
       // Create image records for pre-uploaded images
       for (const imageUrl of input.imageUrls) {

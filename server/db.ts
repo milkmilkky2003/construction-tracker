@@ -117,8 +117,8 @@ export async function getProjectById(projectId: number) {
 export async function createProject(data: InsertProject) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const result = await db.insert(projects).values(data);
-  return result;
+  const result = await db.insert(projects).values(data).returning();
+  return result[0];
 }
 
 export async function updateProject(projectId: number, data: Partial<InsertProject>) {
@@ -152,8 +152,8 @@ export async function getProjectUpdateWithImages(updateId: number) {
 export async function createProjectUpdate(data: InsertProjectUpdate) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const result = await db.insert(projectUpdates).values(data);
-  return result;
+  const result = await db.insert(projectUpdates).values(data).returning();
+  return result[0];
 }
 
 export async function deleteProjectUpdate(updateId: number) {
@@ -168,7 +168,8 @@ export async function deleteProjectUpdate(updateId: number) {
 export async function createUpdateImage(data: InsertUpdateImage) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return db.insert(updateImages).values(data);
+  const result = await db.insert(updateImages).values(data).returning();
+  return result[0];
 }
 
 export async function getUpdateImages(updateId: number) {

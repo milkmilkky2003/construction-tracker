@@ -106,7 +106,7 @@ describe("projectsRouter", () => {
 
   describe("create - Create project", () => {
     it("should create project for admin user", async () => {
-      vi.mocked(db.createProject).mockResolvedValue({ insertId: 1 } as any);
+      vi.mocked(db.createProject).mockResolvedValue({ id: 1 } as any);
 
       const ctx = createMockContext(mockAdmin);
       const caller = projectsRouter.createCaller(ctx);
@@ -369,7 +369,7 @@ describe("projectsRouter", () => {
       };
 
       vi.mocked(db.getProjectById).mockResolvedValue(mockProject);
-      vi.mocked(db.createProjectUpdate).mockResolvedValue({ insertId: 1 } as any);
+      vi.mocked(db.createProjectUpdate).mockResolvedValue({ id: 1 } as any);
       vi.mocked(db.createUpdateImage).mockResolvedValue({} as any);
 
       const ctx = createMockContext(mockAdmin);
