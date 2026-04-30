@@ -5,6 +5,7 @@ export const ENV = {
   oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
   ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
   adminOpenId: process.env.ADMIN_OPEN_ID ?? "local-admin",
+  adminUserId: Number(process.env.ADMIN_USER_ID ?? "1"),
   adminUsername: process.env.ADMIN_USERNAME ?? "admin",
   adminPassword: process.env.ADMIN_PASSWORD ?? "admin123",
   isProduction: process.env.NODE_ENV === "production",

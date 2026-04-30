@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { projectsRouter } from "./routers/projects";
 import { z } from "zod";
-import { getAdminByUsername, upsertUser } from "./db";
+import { getAdminByUsername } from "./db";
 import bcrypt from "bcryptjs";
 import { sdk } from "./_core/sdk";
 import { ENV } from "./_core/env";
@@ -17,14 +17,6 @@ async function setLocalAdminSession(
   username: string
 ) {
   const openId = ENV.adminOpenId;
-
-  await upsertUser({
-    openId,
-    name: username,
-    loginMethod: "local-admin",
-    role: "admin",
-    lastSignedIn: new Date(),
-  });
 
   const sessionToken = await sdk.signSession(
     {

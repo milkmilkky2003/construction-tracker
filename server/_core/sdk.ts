@@ -268,6 +268,21 @@ class SDKServer {
 
     const sessionUserId = session.openId;
     const signedInAt = new Date();
+
+    if (sessionUserId === ENV.adminOpenId) {
+      return {
+        id: ENV.adminUserId,
+        openId: ENV.adminOpenId,
+        name: session.name,
+        email: null,
+        loginMethod: "local-admin",
+        role: "admin",
+        createdAt: signedInAt,
+        updatedAt: signedInAt,
+        lastSignedIn: signedInAt,
+      };
+    }
+
     let user = await db.getUserByOpenId(sessionUserId);
 
     // If user not in DB, sync from OAuth server automatically
