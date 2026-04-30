@@ -36,7 +36,7 @@ export default function AdminDashboard() {
   const { data: projects, isLoading, refetch } = trpc.projects.list.useQuery();
   const createMutation = trpc.projects.create.useMutation({
     onSuccess: () => {
-      toast.success("Project created successfully");
+      toast.success("สร้างโครงการเสร็จแล้ว");
       setFormData({ name: "", description: "", startDate: "", endDate: "" });
       setIsCreateOpen(false);
       refetch();
@@ -48,7 +48,7 @@ export default function AdminDashboard() {
 
   const updateMutation = trpc.projects.update.useMutation({
     onSuccess: () => {
-      toast.success("Project updated successfully");
+      toast.success("อัปเดตโครงการเสร็จแล้ว");
       setEditingId(null);
       setFormData({ name: "", description: "", startDate: "", endDate: "" });
       refetch();
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
 
   const deleteMutation = trpc.projects.delete.useMutation({
     onSuccess: () => {
-      toast.success("Project deleted successfully");
+      toast.success("ลบโครงการเสร็จแล้ว");
       setDeleteId(null);
       refetch();
     },
@@ -71,7 +71,7 @@ export default function AdminDashboard() {
 
   const handleSubmit = async () => {
     if (!formData.name.trim()) {
-      toast.error("Project name is required");
+      toast.error("กรุณากรอกชื่อโครงการ");
       return;
     }
 
@@ -117,36 +117,36 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Projects</h1>
-            <p className="text-slate-600 mt-1">Manage your construction projects</p>
+            <h1 className="text-3xl font-bold text-slate-900">โครงการ</h1>
+            <p className="text-slate-600 mt-1">จัดการโครงการก่อสร้างของคุณ</p>
           </div>
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => resetForm()} className="gap-2">
-                <Plus className="w-4 h-4" /> New Project
+              <Button onClick={() => resetForm()} className="gap-2 bg-orange-600 hover:bg-orange-700">
+                <Plus className="w-4 h-4" /> โครงการใหม่
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>{editingId ? "Edit Project" : "Create New Project"}</DialogTitle>
+                <DialogTitle>{editingId ? "แก้ไขโครงการ" : "สร้างโครงการใหม่"}</DialogTitle>
                 <DialogDescription>
-                  {editingId ? "Update project details" : "Create a new construction project"}
+                  {editingId ? "อัปเดตรายละเอียดโครงการ" : "สร้างโครงการก่อสร้างใหม่"}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Project Name *</label>
+                  <label className="text-sm font-medium text-slate-700">ชื่อโครงการ *</label>
                   <Input
-                    placeholder="e.g., Luxury Residential Complex"
+                    placeholder="เช่น โครงการอพาร์ทเมนท์หรูหรา"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="mt-1"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Description</label>
+                  <label className="text-sm font-medium text-slate-700">รายละเอียด</label>
                   <Textarea
-                    placeholder="Project description and details"
+                    placeholder="รายละเอียดและข้อมูลโครงการ"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="mt-1"
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-slate-700">Start Date</label>
+                    <label className="text-sm font-medium text-slate-700">วันเริ่มต้น</label>
                     <Input
                       type="date"
                       value={formData.startDate}
@@ -164,7 +164,7 @@ export default function AdminDashboard() {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-700">End Date</label>
+                    <label className="text-sm font-medium text-slate-700">วันสิ้นสุด</label>
                     <Input
                       type="date"
                       value={formData.endDate}
@@ -178,7 +178,7 @@ export default function AdminDashboard() {
                   disabled={createMutation.isPending || updateMutation.isPending}
                   className="w-full"
                 >
-                  {editingId ? "Update Project" : "Create Project"}
+                  {editingId ? "อัปเดตโครงการ" : "สร้างโครงการ"}
                 </Button>
               </div>
             </DialogContent>
@@ -221,7 +221,7 @@ export default function AdminDashboard() {
 
                   {/* Access Code */}
                   <div className="bg-slate-50 p-3 rounded-lg">
-                    <p className="text-xs text-slate-600 mb-2">Access Code</p>
+                    <p className="text-xs text-slate-600 mb-2">รหัสเข้าถึง</p>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 text-sm font-mono font-bold text-slate-900">
                         {project.accessCode}
@@ -241,10 +241,10 @@ export default function AdminDashboard() {
 
                   {/* Progress */}
                   <div>
-                    <p className="text-xs text-slate-600 mb-2">Progress</p>
+                    <p className="text-xs text-slate-600 mb-2">ความก้าวหน้า</p>
                     <div className="w-full bg-slate-200 rounded-full h-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full transition-all"
+                        className="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full transition-all"
                         style={{ width: `${parseFloat(project.progressPercentage)}%` }}
                       ></div>
                     </div>
@@ -259,7 +259,7 @@ export default function AdminDashboard() {
                       onClick={() => handleEdit(project)}
                       className="flex-1 gap-2"
                     >
-                      <Edit2 className="w-4 h-4" /> Edit
+                      <Edit2 className="w-4 h-4" /> แก้ไข
                     </Button>
                     <Button
                       variant="outline"
@@ -267,7 +267,7 @@ export default function AdminDashboard() {
                       onClick={() => setLocation(`/admin/project/${project.id}`)}
                       className="flex-1 gap-2"
                     >
-                      <Upload className="w-4 h-4" /> Manage
+                      <Upload className="w-4 h-4" /> จัดการ
                     </Button>
                     <AlertDialog open={deleteId === project.id} onOpenChange={(open) => !open && setDeleteId(null)}>
                       <button
@@ -278,18 +278,18 @@ export default function AdminDashboard() {
                       </button>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Project</AlertDialogTitle>
+                          <AlertDialogTitle>ลบโครงการ</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to delete "{project.name}"? This action cannot be undone.
+                            คุณแน่ใจหรือว่าต้องการลบ "{project.name}"? ไม่สามารถเลิกทำได้
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <div className="flex gap-3">
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => deleteMutation.mutate({ projectId: project.id })}
                             className="bg-red-600 hover:bg-red-700"
                           >
-                            Delete
+                            ลบ
                           </AlertDialogAction>
                         </div>
                       </AlertDialogContent>
@@ -302,9 +302,9 @@ export default function AdminDashboard() {
         ) : (
           <Card className="text-center py-12">
             <CardContent>
-              <p className="text-slate-600 mb-4">No projects yet</p>
-              <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
-                <Plus className="w-4 h-4" /> Create Your First Project
+              <p className="text-slate-600 mb-4">ยังไม่มีโครงการ</p>
+              <Button onClick={() => setIsCreateOpen(true)} className="gap-2 bg-orange-600 hover:bg-orange-700">
+                <Plus className="w-4 h-4" /> สร้างโครงการแรก
               </Button>
             </CardContent>
           </Card>
