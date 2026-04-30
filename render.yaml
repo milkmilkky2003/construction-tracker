@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: construction-tracker
+    env: node
+    plan: free
+    buildCommand: pnpm install && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: construction-tracker-db
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false
+      - key: VITE_APP_ID
+        sync: false
+      - key: OAUTH_SERVER_URL
+        value: https://api.manus.im
+      - key: VITE_OAUTH_PORTAL_URL
+        value: https://portal.manus.im
+      - key: OWNER_NAME
+        sync: false
+      - key: OWNER_OPEN_ID
+        sync: false
+      - key: BUILT_IN_FORGE_API_URL
+        value: https://api.manus.im
+      - key: BUILT_IN_FORGE_API_KEY
+        sync: false
+      - key: VITE_FRONTEND_FORGE_API_URL
+        value: https://api.manus.im
+      - key: VITE_FRONTEND_FORGE_API_KEY
+        sync: false
+      - key: VITE_APP_TITLE
+        value: BuildTrack Pro
+      - key: VITE_APP_LOGO
+        sync: false
+
+databases:
+  - name: construction-tracker-db
+    plan: free
+    databaseName: construction_tracker
+    user: postgres
+    region: singapore
