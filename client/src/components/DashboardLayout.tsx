@@ -238,13 +238,14 @@ function DashboardLayoutContent({
 
       <SidebarInset className="bg-[#f3efe8]">
         {isMobile && (
-          <div className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-[#e5ddd2] bg-[#fbfaf7]/95 px-2 backdrop-blur">
+          <div className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-[#e5ddd2] bg-[#fbfaf7]/95 px-4 backdrop-blur">
             <div className="flex items-center gap-2">
-              <SidebarTrigger className="h-9 w-9 rounded-[4px] bg-white" />
-              <span className="text-[#2c241c]">
+              <SidebarTrigger className="h-9 w-9 rounded-[4px] bg-white border border-[#ece4d9] text-[#8b7660]" />
+              <span className="text-sm font-semibold text-[#2c241c] font-sans">
                 {activeMenuItem?.label ?? "เมนู"}
               </span>
             </div>
+            <img src="/LogoNew.png" className="h-8 w-8 object-contain rounded-full border border-[#d7c7b5] bg-white p-0.5" alt="Siwakit Logo" />
           </div>
         )}
         <main className="flex-1 p-4 md:p-6">{children}</main>

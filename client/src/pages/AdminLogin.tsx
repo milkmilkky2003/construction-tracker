@@ -48,12 +48,10 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-[#fbfaf7] text-[#2c241c]">
       <div className="grid min-h-screen lg:grid-cols-[1.1fr_0.9fr]">
-        {/* Left Section - Content & Branding */}
-        <section className="relative flex flex-col justify-between p-6 md:p-12 lg:p-16 bg-[#fbfaf7] border-r border-[#ece4d9]">
+        {/* Left Section - Content & Branding (Hidden on Mobile/Tablet) */}
+        <section className="hidden lg:flex relative flex-col justify-between p-6 md:p-12 lg:p-16 bg-[#fbfaf7] border-r border-[#ece4d9]">
           <div className="relative z-10 flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[#d7c7b5] text-sm font-semibold text-[#8b7660] bg-[#fbfaf7]">
-              S
-            </div>
+            <img src="/LogoNew.png" className="h-11 w-11 object-contain rounded-full border border-[#d7c7b5] bg-white p-0.5" alt="Siwakit Logo" />
             <div className="leading-none text-left">
               <span className="block text-[13px] font-semibold uppercase tracking-[0.34em] text-[#6d604f]">
                 Siwakit
