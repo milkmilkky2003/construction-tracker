@@ -25,7 +25,6 @@ import { FolderKanban, LogOut, PanelLeft } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
-import { Button } from "./ui/button";
 
 const menuItems = [
   { icon: FolderKanban, label: "โครงการ", path: "/admin" },
@@ -46,40 +45,26 @@ export default function DashboardLayout({
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
   const { loading, user } = useAuth();
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
   }, [sidebarWidth]);
+
+  // Redirect to login as soon as we know the user is not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      setLocation(getLoginUrl());
+    }
+  }, [loading, user, setLocation]);
 
   if (loading) {
     return <DashboardLayoutSkeleton />;
   }
 
   if (!user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f3efe8] px-4">
-        <div className="w-full max-w-md rounded-[8px] border border-[#e5ddd2] bg-[#fbfaf7] p-8 text-center shadow-[0_18px_50px_rgba(75,60,42,0.08)]">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-[#d7c7b5] text-2xl font-semibold text-[#8b7660]">
-            S
-          </div>
-          <h1 className="text-2xl font-semibold text-[#2c241c]">
-            กรุณาเข้าสู่ระบบ
-          </h1>
-          <p className="mt-2 text-sm text-[#766a5c]">
-            ต้องเข้าสู่ระบบก่อนเพื่อจัดการโครงการก่อสร้าง
-          </p>
-          <Button
-            onClick={() => {
-              window.location.href = getLoginUrl();
-            }}
-            size="lg"
-            className="mt-6 w-full rounded-[4px] bg-[#8b7660] text-white hover:bg-[#75624f]"
-          >
-            เข้าสู่ระบบ
-          </Button>
-        </div>
-      </div>
-    );
+    // Return skeleton while the redirect effect is running
+    return <DashboardLayoutSkeleton />;
   }
 
   return (

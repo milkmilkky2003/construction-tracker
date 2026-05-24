@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { HardHat, LockKeyhole, UserRound } from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 export default function AdminLogin() {
   const [, setLocation] = useLocation();
@@ -13,6 +14,15 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
 
   const loginMutation = trpc.auth.adminLogin.useMutation();
+  const utils = trpc.useUtils();
+  const { user, loading } = useAuth();
+
+  // If already logged in, redirect to dashboard
+  useEffect(() => {
+    if (!loading && user) {
+      setLocation("/admin");
+    }
+  }, [loading, user, setLocation]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +34,8 @@ export default function AdminLogin() {
     setIsLoading(true);
     try {
       await loginMutation.mutateAsync({ username, password });
+      // Refresh auth cache before navigating so AdminDashboard sees the user immediately
+      await utils.auth.me.invalidate();
       toast.success("เข้าสู่ระบบสำเร็จ");
       setLocation("/admin");
     } catch (error) {
