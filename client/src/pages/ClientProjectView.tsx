@@ -70,10 +70,10 @@ export default function ClientProjectView() {
               S
             </div>
             <h1 className="text-xl font-semibold text-stone-950">
-              ไม่พบโครงการ
+              เกิดข้อผิดพลาด
             </h1>
             <p className="mt-2 text-sm text-stone-500">
-              รหัสโครงการไม่ถูกต้องหรือหมดอายุ กรุณาตรวจสอบรหัสอีกครั้ง
+              {error?.message || "รหัสโครงการไม่ถูกต้องหรือหมดอายุ กรุณาตรวจสอบรหัสอีกครั้ง"}
             </p>
             <Button
               onClick={() => setLocation("/")}
@@ -195,6 +195,7 @@ export default function ClientProjectView() {
             {sortedUpdates.length > 0 ? (
               sortedUpdates.map((update) => {
                 const meta = categoryLabels[update.category as WorkCategory];
+                if (!meta) return null;
                 return (
                   <div key={update.id} className="relative">
                     {/* Timeline Node Point */}
@@ -257,6 +258,7 @@ export default function ClientProjectView() {
             <section className="grid gap-4 md:grid-cols-3">
               {(Object.keys(categoryGroups) as WorkCategory[]).map((category) => {
                 const meta = categoryLabels[category];
+                if (!meta) return null;
                 const updates = categoryGroups[category] || [];
                 const count = updates.length;
                 const status = category === "Structure" ? project.structureStatus :
@@ -294,6 +296,7 @@ export default function ClientProjectView() {
             <section className="space-y-4">
               {(Object.keys(categoryGroups) as WorkCategory[]).map((category) => {
                 const meta = categoryLabels[category];
+                if (!meta) return null;
                 const categoryUpdates = categoryGroups[category] || [];
                 const isOpen = expandedCategory === category;
                 const status = category === "Structure" ? project.structureStatus :

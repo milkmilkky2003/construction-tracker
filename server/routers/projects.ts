@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { adminProcedure, publicProcedure, router } from "../_core/trpc";
 import {
@@ -181,7 +182,12 @@ export const projectsRouter = router({
     .input(z.object({ accessCode: z.string() }))
     .query(async ({ input }) => {
       const project = await getProjectByAccessCode(input.accessCode);
-      if (!project) throw new Error("Invalid access code");
+      if (!project) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "ไม่พบรหัสโครงการที่ระบุ หรือรหัสไม่ถูกต้อง",
+        });
+      }
       const updates = await getProjectUpdates(project.id);
       const updatesWithImages = await Promise.all(
         updates.map(async (update) => {

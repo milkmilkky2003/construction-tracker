@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { 
@@ -92,7 +92,8 @@ export async function getProjectsByOwner(ownerId: number) {
 export async function getProjectByAccessCode(accessCode: string) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select().from(projects).where(eq(projects.accessCode, accessCode)).limit(1);
+  const trimmedCode = accessCode.trim().toUpperCase();
+  const result = await db.select().from(projects).where(sql`UPPER(${projects.accessCode}) = ${trimmedCode}`).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 

@@ -194,9 +194,23 @@ export default function ProjectDetail() {
   });
 
   const handleUpdateProgress = () => {
+    // Recalculate overall progress based on weights before saving
+    const sProg = Number(progressData.structure) || 0;
+    const sysProg = Number(progressData.systems) || 0;
+    const iProg = Number(progressData.interior) || 0;
+
+    const sWeight = project.hasStructure ? Number(project.structureWeight) : 0;
+    const sysWeight = project.hasSystems ? Number(project.systemsWeight) : 0;
+    const iWeight = project.hasInterior ? Number(project.interiorWeight) : 0;
+
+    const tWeight = sWeight + sysWeight + iWeight;
+    const calculatedOverall = tWeight > 0 
+      ? Math.round((sProg * sWeight + sysProg * sysWeight + iProg * iWeight) / tWeight)
+      : 0;
+
     updateProgressMutation.mutate({
       projectId: id,
-      progressPercentage: progressData.overall,
+      progressPercentage: calculatedOverall.toString(),
       structureProgress: progressData.structure,
       systemsProgress: progressData.systems,
       interiorProgress: progressData.interior,
