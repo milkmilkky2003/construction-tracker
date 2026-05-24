@@ -390,7 +390,7 @@ export default function ProjectDetail() {
                 <ArrowLeft className="h-5 w-5" />
               </button>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-orange-700">
+                <p className="text-sm font-medium text-[#8b7660]">
                   รายละเอียดโครงการ
                 </p>
                 <h1 className="mt-1 text-3xl font-semibold leading-[1.3] text-stone-950">
@@ -404,7 +404,7 @@ export default function ProjectDetail() {
 
             <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
               <DialogTrigger asChild>
-                <Button className="h-11 gap-2 bg-orange-600 text-white hover:bg-orange-700">
+                <Button className="h-11 gap-2 bg-[#8b7660] text-white hover:bg-[#75624f]">
                   <Upload className="h-4 w-4" />
                   เพิ่ม update
                 </Button>
@@ -462,7 +462,7 @@ export default function ProjectDetail() {
                     </span>
                     <label
                       htmlFor="photo-upload"
-                      className="mt-2 flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-stone-300 bg-stone-50 px-4 py-6 text-center transition hover:border-orange-300 hover:bg-orange-50"
+                      className="mt-2 flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-stone-300 bg-stone-50 px-4 py-6 text-center transition hover:border-[#8b7660] hover:bg-[#fbfaf7]"
                     >
                       <input
                         type="file"
@@ -491,7 +491,7 @@ export default function ProjectDetail() {
                   <Button
                     onClick={handleUpload}
                     disabled={uploadMutation.isPending || uploadData.isUploading}
-                    className="h-11 w-full bg-orange-600 text-white hover:bg-orange-700"
+                    className="h-11 w-full bg-[#8b7660] text-white hover:bg-[#75624f]"
                   >
                     {uploadData.isUploading ? "กำลังอัปโหลด..." : "อัปโหลด update"}
                   </Button>
@@ -584,7 +584,7 @@ export default function ProjectDetail() {
                     </span>
                     <label
                       htmlFor="photo-edit-upload"
-                      className="mt-2 flex min-h-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-stone-300 bg-stone-50 px-4 py-4 text-center transition hover:border-orange-300 hover:bg-orange-50"
+                      className="mt-2 flex min-h-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-stone-300 bg-stone-50 px-4 py-4 text-center transition hover:border-[#8b7660] hover:bg-[#fbfaf7]"
                     >
                       <input
                         type="file"
@@ -611,7 +611,7 @@ export default function ProjectDetail() {
                   <Button
                     onClick={handleEditUpdate}
                     disabled={updateUpdateMutation.isPending || editUpdateData.isUpdating}
-                    className="h-11 w-full bg-orange-600 text-white hover:bg-orange-700"
+                    className="h-11 w-full bg-[#8b7660] text-white hover:bg-[#75624f]"
                   >
                     {editUpdateData.isUpdating ? "กำลังบันทึก..." : "บันทึกการแก้ไข"}
                   </Button>
@@ -661,7 +661,7 @@ export default function ProjectDetail() {
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-2">
-                      <div className="rounded-md bg-orange-50 p-3 text-xs text-orange-800">
+                      <div className="rounded-md bg-[#efe7dc] p-3 text-xs text-[#5c4d3c]">
                         <p className="font-semibold">💡 ระบบคำนวณอัตโนมัติ:</p>
                         <p className="mt-1">ภาพรวมโครงการจะถูกคำนวณตามน้ำหนัก (%) ของหมวดงานที่คุณเลือกไว้</p>
                       </div>
@@ -725,7 +725,7 @@ export default function ProjectDetail() {
                       <Button
                         onClick={handleUpdateProgress}
                         disabled={updateProgressMutation.isPending}
-                        className="h-11 w-full bg-orange-600 text-white hover:bg-orange-700 mt-4"
+                        className="h-11 w-full bg-[#8b7660] text-white hover:bg-[#75624f] mt-4"
                       >
                         บันทึกความคืบหน้า
                       </Button>
@@ -735,7 +735,7 @@ export default function ProjectDetail() {
               </div>
               <div className="h-3 rounded-full bg-stone-100">
                 <div
-                  className="h-3 rounded-full bg-orange-600"
+                  className="h-3 rounded-full bg-[#8b7660]"
                   style={{
                     width: `${Math.min(weightedProgress, 100)}%`,
                   }}
@@ -799,7 +799,7 @@ export default function ProjectDetail() {
                             regenerateCodeMutation.mutate({ projectId: id });
                             setIsRegenOpen(false);
                           }}
-                          className="bg-orange-600 hover:bg-orange-700 text-white"
+                          className="bg-[#8b7660] hover:bg-[#75624f] text-[#fbfaf7]"
                         >
                           ยืนยันสร้างรหัสใหม่
                         </AlertDialogAction>
@@ -963,7 +963,7 @@ function MiniProgress({ label, value, status }: { label: string; value: string |
       </div>
       <div className="h-1.5 rounded-full bg-stone-100">
         <div
-          className="h-1.5 rounded-full bg-orange-500"
+          className="h-1.5 rounded-full bg-[#8b7660]"
           style={{ width: `${Math.min(progress, 100)}%` }}
         />
       </div>

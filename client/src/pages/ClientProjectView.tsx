@@ -42,9 +42,7 @@ export default function ClientProjectView() {
       <div className="flex min-h-screen items-center justify-center bg-[#f7f4ef] px-4">
         <Card className="w-full max-w-md border-stone-200 bg-white">
           <CardContent className="py-10 text-center">
-            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-md bg-orange-600 text-lg font-semibold text-white">
-              S
-            </div>
+            <img src="/LogoNew.png" className="mx-auto mb-5 h-14 w-14 shrink-0 object-contain rounded-md border border-stone-200" alt="Siwakit Logo" />
             <h1 className="text-xl font-semibold text-stone-950">
               เกิดข้อผิดพลาด
             </h1>
@@ -103,7 +101,7 @@ export default function ClientProjectView() {
         <section className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm md:p-7">
           <div className="grid gap-6 lg:grid-cols-[1fr_auto]">
             <div>
-              <p className="text-sm font-medium text-orange-700">
+              <p className="text-sm font-medium text-[#8b7660]">
                 รายงานความคืบหน้าโครงการ
               </p>
               <h1 className="mt-2 text-3xl font-semibold leading-[1.3] md:text-4xl">
@@ -117,14 +115,14 @@ export default function ClientProjectView() {
             </div>
             <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
               <p className="text-sm text-stone-500">ความคืบหน้ารวม</p>
-              <p className="mt-1 text-4xl font-semibold text-orange-700">
+              <p className="mt-1 text-4xl font-semibold text-[#8b7660]">
                 {weightedProgress}%
               </p>
             </div>
           </div>
           <div className="mt-6 h-3 rounded-full bg-stone-100">
             <div
-              className="h-3 rounded-full bg-orange-600"
+              className="h-3 rounded-full bg-[#8b7660]"
               style={{
                 width: `${Math.min(
                   Number(weightedProgress || 0),
@@ -145,7 +143,7 @@ export default function ClientProjectView() {
             onClick={() => setViewMode("timeline")}
             className={`flex-1 text-center py-2.5 text-sm font-semibold rounded-md transition-all ${
               viewMode === "timeline"
-                ? "bg-orange-600 text-white shadow-sm"
+                ? "bg-[#8b7660] text-white shadow-sm"
                 : "text-stone-600 hover:text-[#2c241c] hover:bg-stone-50"
             }`}
           >
@@ -155,7 +153,7 @@ export default function ClientProjectView() {
             onClick={() => setViewMode("category")}
             className={`flex-1 text-center py-2.5 text-sm font-semibold rounded-md transition-all ${
               viewMode === "category"
-                ? "bg-orange-600 text-white shadow-sm"
+                ? "bg-[#8b7660] text-white shadow-sm"
                 : "text-stone-600 hover:text-[#2c241c] hover:bg-stone-50"
             }`}
           >
@@ -165,7 +163,7 @@ export default function ClientProjectView() {
 
         {viewMode === "timeline" ? (
           /* Chronological Timeline view */
-          <div className="relative border-l-2 border-orange-200 ml-4 md:ml-6 pl-6 md:pl-8 space-y-6 py-2">
+          <div className="relative border-l-2 border-[#d7c7b5] ml-4 md:ml-6 pl-6 md:pl-8 space-y-6 py-2">
             {sortedUpdates.length > 0 ? (
               sortedUpdates.map((update) => {
                 const meta = categoryLabels[update.category as WorkCategory];
@@ -363,7 +361,7 @@ export default function ClientProjectView() {
         {allImages.length > 0 && (
           <section className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center gap-2">
-              <ImageIcon className="h-5 w-5 text-orange-700" />
+              <ImageIcon className="h-5 w-5 text-[#8b7660]" />
               <h2 className="text-xl font-semibold">แกลเลอรีรูปภาพ</h2>
             </div>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -437,7 +435,7 @@ function DateInfo({
 }) {
   return (
     <div className="flex items-center gap-3 rounded-lg border border-stone-200 p-4">
-      <div className="flex h-10 w-10 items-center justify-center rounded-md bg-orange-50 text-orange-700">
+      <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#efe7dc] text-[#8b7660]">
         <CalendarDays className="h-5 w-5" />
       </div>
       <div>
