@@ -21,12 +21,13 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { FolderKanban, LogOut, PanelLeft } from "lucide-react";
+import { FolderKanban, House, LogOut, PanelLeft } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 
 const menuItems = [
+  { icon: House, label: "หน้าแรก", path: "/" },
   { icon: FolderKanban, label: "โครงการ", path: "/admin" },
 ];
 
@@ -175,8 +176,10 @@ function DashboardLayoutContent({
             <SidebarMenu>
               {menuItems.map((item) => {
                 const isActive =
-                  location === item.path ||
-                  (item.path === "/admin" && location.startsWith("/admin"));
+                  item.path === "/"
+                    ? location === "/"
+                    : location === item.path ||
+                      (item.path === "/admin" && location.startsWith("/admin"));
                 return (
                   <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton
