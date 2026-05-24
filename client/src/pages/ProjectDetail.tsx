@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
+  AlertDialogTrigger,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
@@ -46,30 +47,24 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { categoryMeta, getStatusBadgeClass, safeFormatDate, type WorkCategory } from "@/lib/projectUtils";
 
-type WorkCategory = "Structure" | "Systems" | "Interior Finishing";
+interface UpdateImage {
+  id: number;
+  updateId: number;
+  imageUrl: string;
+  imageKey: string;
+}
 
-const categoryMeta: Record<
-  WorkCategory,
-  { thai: string; subtitle: string; tone: string }
-> = {
-  Structure: {
-    thai: "โครงสร้าง",
-    subtitle: "งานฐานราก เสา คาน พื้น และโครงสร้างหลัก",
-    tone: "bg-orange-50 text-orange-700 border-orange-200",
-  },
-  Systems: {
-    thai: "งานระบบ",
-    subtitle: "ไฟฟ้า ประปา สุขาภิบาล และระบบประกอบอาคาร",
-    tone: "bg-sky-50 text-sky-700 border-sky-200",
-  },
-  "Interior Finishing": {
-    thai: "งานตกแต่ง",
-    subtitle: "ฝ้า ผนัง พื้น สี เฟอร์นิเจอร์ และเก็บงาน",
-    tone: "bg-stone-100 text-stone-700 border-stone-200",
-  },
-};
+interface ProjectUpdate {
+  id: number;
+  projectId: number;
+  category: string;
+  description: string | null;
+  uploadedAt: Date | string;
+  updatedAt: Date | string | null;
+  images: UpdateImage[];
+}
 
 function readFileAsDataUrl(file: File) {
   return new Promise<string>((resolve, reject) => {
@@ -91,6 +86,7 @@ export default function ProjectDetail() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [isProgressOpen, setIsProgressOpen] = useState(false);
+  const [isRegenOpen, setIsRegenOpen] = useState(false);
   const [progressData, setProgressData] = useState({
     overall: "0",
     structure: "0",
@@ -194,14 +190,15 @@ export default function ProjectDetail() {
   });
 
   const handleUpdateProgress = () => {
+    if (!data?.project) return;
     // Recalculate overall progress based on weights before saving
     const sProg = Number(progressData.structure) || 0;
     const sysProg = Number(progressData.systems) || 0;
     const iProg = Number(progressData.interior) || 0;
 
-    const sWeight = project.hasStructure ? Number(project.structureWeight) : 0;
-    const sysWeight = project.hasSystems ? Number(project.systemsWeight) : 0;
-    const iWeight = project.hasInterior ? Number(project.interiorWeight) : 0;
+    const sWeight = data.project.hasStructure ? Number(data.project.structureWeight) : 0;
+    const sysWeight = data.project.hasSystems ? Number(data.project.systemsWeight) : 0;
+    const iWeight = data.project.hasInterior ? Number(data.project.interiorWeight) : 0;
 
     const tWeight = sWeight + sysWeight + iWeight;
     const calculatedOverall = tWeight > 0 
@@ -221,6 +218,7 @@ export default function ProjectDetail() {
   };
 
   const handleUpload = async () => {
+    if (uploadData.isUploading || uploadMutation.isPending) return;
     if (!uploadData.description.trim()) {
       toast.error("กรุณากรอกรายละเอียดงาน");
       return;
@@ -253,7 +251,7 @@ export default function ProjectDetail() {
     }
   };
 
-  const openEditUpdate = (update: any) => {
+  const openEditUpdate = (update: ProjectUpdate) => {
     setEditingUpdateId(update.id);
     setEditUpdateData({
       category: update.category as WorkCategory,
@@ -267,6 +265,7 @@ export default function ProjectDetail() {
   };
 
   const handleEditUpdate = async () => {
+    if (editUpdateData.isUpdating || updateUpdateMutation.isPending) return;
     if (!editUpdateData.description.trim()) {
       toast.error("กรุณากรอกรายละเอียดงาน");
       return;
@@ -366,13 +365,10 @@ export default function ProjectDetail() {
       )
     : 0;
 
-  const categoryGroups: Record<WorkCategory, typeof updates> = {
-    Structure: updates.filter((u) => u.category === "Structure"),
-    Systems: updates.filter((u) => u.category === "Systems"),
-    "Interior Finishing": updates.filter(
-      (u) => u.category === "Interior Finishing"
-    ),
-  };
+  const categoryGroups: Partial<Record<WorkCategory, typeof updates>> = {};
+  if (project.hasStructure) categoryGroups.Structure = updates.filter((u) => u.category === "Structure");
+  if (project.hasSystems) categoryGroups.Systems = updates.filter((u) => u.category === "Systems");
+  if (project.hasInterior) categoryGroups["Interior Finishing"] = updates.filter((u) => u.category === "Interior Finishing");
   
   // Conditionally filter categories based on scope
   const activeCategories: WorkCategory[] = [];
@@ -758,7 +754,7 @@ export default function ProjectDetail() {
               <InfoItem
                 icon={CalendarDays}
                 label="ระยะเวลา"
-                value={`${project.startDate ? format(new Date(project.startDate), "d MMM yyyy") : "ไม่ระบุ"} - ${project.endDate ? format(new Date(project.endDate), "d MMM yyyy") : "ไม่ระบุ"}`}
+                value={`${safeFormatDate(project.startDate, "d MMM yyyy")} - ${safeFormatDate(project.endDate, "d MMM yyyy")}`}
               />
               <div className="rounded-lg border border-stone-200 p-4">
                 <p className="text-sm text-stone-500">รหัสสำหรับลูกค้า</p>
@@ -777,18 +773,39 @@ export default function ProjectDetail() {
                       <Copy className="h-4 w-4" />
                     )}
                   </button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() =>
-                      regenerateCodeMutation.mutate({ projectId: id })
-                    }
-                    disabled={regenerateCodeMutation.isPending}
-                    className="gap-2"
-                  >
-                    <RefreshCw className="h-3.5 w-3.5" />
-                    สร้างใหม่
-                  </Button>
+                  <AlertDialog open={isRegenOpen} onOpenChange={setIsRegenOpen}>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-2"
+                        disabled={regenerateCodeMutation.isPending}
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        สร้างใหม่
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="rounded-[8px]">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>ยืนยันการสร้างรหัสโครงการใหม่</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          คุณต้องการสร้างรหัสโครงการใหม่ใช่ไหม? รหัสเดิมของลูกค้าจะไม่สามารถใช้งานได้ทันที
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <div className="flex gap-3">
+                        <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => {
+                            regenerateCodeMutation.mutate({ projectId: id });
+                            setIsRegenOpen(false);
+                          }}
+                          className="bg-orange-600 hover:bg-orange-700 text-white"
+                        >
+                          ยืนยันสร้างรหัสใหม่
+                        </AlertDialogAction>
+                      </div>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             </CardContent>
@@ -797,7 +814,7 @@ export default function ProjectDetail() {
 
         <section className="space-y-5">
           {activeCategories.map((category) => {
-            const categoryUpdates = categoryGroups[category];
+            const categoryUpdates = categoryGroups[category] || [];
             const meta = categoryMeta[category];
             return (
               <div
@@ -832,7 +849,7 @@ export default function ProjectDetail() {
                                 {update.description}
                               </p>
                               <p className="mt-1 text-xs text-stone-500">
-                                {format(new Date(update.uploadedAt), "d MMM yyyy HH:mm")}
+                                {safeFormatDate(update.uploadedAt, "d MMM yyyy HH:mm")}
                               </p>
                             </div>
                             <div className="flex shrink-0 items-center gap-1">
@@ -907,18 +924,7 @@ export default function ProjectDetail() {
   );
 }
 
-function getStatusBadgeClass(status: string) {
-  switch (status) {
-    case "เสร็จแล้ว":
-      return "bg-emerald-50 text-emerald-700 border-emerald-200";
-    case "รอตรวจ":
-      return "bg-sky-50 text-sky-700 border-sky-200";
-    case "ปฏิบัติงาน":
-      return "bg-amber-50 text-amber-700 border-amber-200 font-semibold animate-pulse";
-    default: // ยังไม่เริ่ม
-      return "bg-stone-50 text-stone-500 border-stone-200";
-  }
-}
+
 
 function StatusSelect({
   label,
@@ -947,7 +953,7 @@ function StatusSelect({
   );
 }
 
-function MiniProgress({ label, value, status }: { label: string; value: string; status: string }) {
+function MiniProgress({ label, value, status }: { label: string; value: string | null; status: string }) {
   const progress = Number(value || 0);
   return (
     <div className="rounded-md border border-stone-200 p-3 bg-white">

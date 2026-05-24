@@ -39,7 +39,7 @@ import {
   Upload,
 } from "lucide-react";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { safeFormatDate } from "@/lib/projectUtils";
 
 type ProjectCard = {
   id: number;
@@ -57,6 +57,10 @@ type ProjectCard = {
   interiorWeight: number;
 };
 
+const DEFAULT_STRUCTURE_WEIGHT = 33;
+const DEFAULT_SYSTEMS_WEIGHT = 33;
+const DEFAULT_INTERIOR_WEIGHT = 34;
+
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
@@ -73,9 +77,9 @@ export default function AdminDashboard() {
     hasStructure: true,
     hasSystems: true,
     hasInterior: true,
-    structureWeight: 33,
-    systemsWeight: 33,
-    interiorWeight: 34,
+    structureWeight: DEFAULT_STRUCTURE_WEIGHT,
+    systemsWeight: DEFAULT_SYSTEMS_WEIGHT,
+    interiorWeight: DEFAULT_INTERIOR_WEIGHT,
   });
 
   const { data: projects, isLoading, refetch } = trpc.projects.list.useQuery(
@@ -134,9 +138,9 @@ export default function AdminDashboard() {
       hasStructure: true,
       hasSystems: true,
       hasInterior: true,
-      structureWeight: 33,
-      systemsWeight: 33,
-      interiorWeight: 34,
+      structureWeight: DEFAULT_STRUCTURE_WEIGHT,
+      systemsWeight: DEFAULT_SYSTEMS_WEIGHT,
+      interiorWeight: DEFAULT_INTERIOR_WEIGHT,
     });
     setEditingId(null);
   };
@@ -144,6 +148,21 @@ export default function AdminDashboard() {
   const handleSubmit = async () => {
     if (!formData.name.trim()) {
       toast.error("กรุณากรอกชื่อโครงการ");
+      return;
+    }
+
+    if (!formData.hasStructure && !formData.hasSystems && !formData.hasInterior) {
+      toast.error("กรุณาเลือกหมวดงานอย่างน้อย 1 หมวด");
+      return;
+    }
+
+    const activeWeightsSum = 
+      (formData.hasStructure ? formData.structureWeight : 0) +
+      (formData.hasSystems ? formData.systemsWeight : 0) +
+      (formData.hasInterior ? formData.interiorWeight : 0);
+
+    if (activeWeightsSum !== 100) {
+      toast.error(`สัดส่วนน้ำหนักของหมวดงานที่เปิดใช้งานต้องรวมกันได้ 100% (ปัจจุบันรวมได้ ${activeWeightsSum}%)`);
       return;
     }
 
@@ -345,11 +364,11 @@ export default function AdminDashboard() {
                           <CalendarDays className="h-4 w-4 text-[#a58762]" />
                           <span>
                             {project.startDate
-                              ? format(new Date(project.startDate), "d MMM yyyy")
+                              ? safeFormatDate(project.startDate, "d MMM yyyy")
                               : "ยังไม่ระบุวันเริ่ม"}
                             {" - "}
                             {project.endDate
-                              ? format(new Date(project.endDate), "d MMM yyyy")
+                              ? safeFormatDate(project.endDate, "d MMM yyyy")
                               : "ยังไม่ระบุวันสิ้นสุด"}
                           </span>
                         </div>

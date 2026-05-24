@@ -11,6 +11,7 @@ import {
   materials, InsertMaterial
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { storageDelete } from "./storage";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -160,7 +161,14 @@ export async function createProjectUpdate(data: InsertProjectUpdate) {
 export async function deleteProjectUpdate(updateId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  // Delete associated images first
+  // Delete associated images from storage first
+  const images = await db.select().from(updateImages).where(eq(updateImages.updateId, updateId));
+  for (const image of images) {
+    if (image.imageKey) {
+      await storageDelete(image.imageKey);
+    }
+  }
+  // Delete associated image records
   await db.delete(updateImages).where(eq(updateImages.updateId, updateId));
   return db.delete(projectUpdates).where(eq(projectUpdates.id, updateId));
 }
@@ -174,6 +182,10 @@ export async function updateProjectUpdate(updateId: number, data: Partial<Insert
 export async function deleteUpdateImage(imageId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  const result = await db.select().from(updateImages).where(eq(updateImages.id, imageId)).limit(1);
+  if (result.length > 0 && result[0].imageKey) {
+    await storageDelete(result[0].imageKey);
+  }
   return db.delete(updateImages).where(eq(updateImages.id, imageId));
 }
 

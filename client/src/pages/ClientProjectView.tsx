@@ -5,33 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ArrowLeft, CalendarDays, ChevronDown, ImageIcon, X } from "lucide-react";
-import { format } from "date-fns";
+import { categoryMeta as categoryLabels, getStatusBadgeClass, safeFormatDate, type WorkCategory } from "@/lib/projectUtils";
 
-type WorkCategory = "Structure" | "Systems" | "Interior Finishing";
-
-const categoryLabels: Record<
-  WorkCategory,
-  { thai: string; subtitle: string; tone: string; bar: string }
-> = {
-  Structure: {
-    thai: "โครงสร้าง",
-    subtitle: "ฐานราก เสา คาน พื้น และโครงสร้างหลัก",
-    tone: "bg-orange-50 text-orange-700 border-orange-200",
-    bar: "bg-orange-600",
-  },
-  Systems: {
-    thai: "งานระบบ",
-    subtitle: "ไฟฟ้า ประปา สุขาภิบาล และระบบประกอบอาคาร",
-    tone: "bg-sky-50 text-sky-700 border-sky-200",
-    bar: "bg-sky-600",
-  },
-  "Interior Finishing": {
-    thai: "งานตกแต่ง",
-    subtitle: "ฝ้า ผนัง พื้น สี เฟอร์นิเจอร์ และเก็บงาน",
-    tone: "bg-stone-100 text-stone-700 border-stone-200",
-    bar: "bg-stone-700",
-  },
-};
 
 export default function ClientProjectView() {
   const [, setLocation] = useLocation();
@@ -39,6 +14,7 @@ export default function ClientProjectView() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [expandedCategory, setExpandedCategory] =
     useState<WorkCategory>("Structure");
+  const [viewMode, setViewMode] = useState<"category" | "timeline">("timeline");
 
   const { data, isLoading, error } = trpc.projects.getByAccessCode.useQuery(
     { accessCode: accessCode || "" },
@@ -104,8 +80,6 @@ export default function ClientProjectView() {
       )
     : 0;
 
-  const [viewMode, setViewMode] = useState<"category" | "timeline">("timeline");
-
   const categoryGroups: Partial<Record<WorkCategory, typeof updates>> = {};
   if (project.hasStructure) categoryGroups.Structure = updates.filter((u) => u.category === "Structure");
   if (project.hasSystems) categoryGroups.Systems = updates.filter((u) => u.category === "Systems");
@@ -144,7 +118,7 @@ export default function ClientProjectView() {
             <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
               <p className="text-sm text-stone-500">ความคืบหน้ารวม</p>
               <p className="mt-1 text-4xl font-semibold text-orange-700">
-                {project.progressPercentage}%
+                {weightedProgress}%
               </p>
             </div>
           </div>
@@ -153,7 +127,7 @@ export default function ClientProjectView() {
               className="h-3 rounded-full bg-orange-600"
               style={{
                 width: `${Math.min(
-                  Number(project.progressPercentage || 0),
+                  Number(weightedProgress || 0),
                   100
                 )}%`,
               }}
@@ -217,7 +191,7 @@ export default function ClientProjectView() {
                           </span>
                         </div>
                         <span className="text-xs font-semibold text-stone-500 bg-stone-100 px-2 py-1 rounded">
-                          {format(new Date(update.uploadedAt), "d MMM yyyy HH:mm น.")}
+                          {safeFormatDate(update.uploadedAt, "d MMM yyyy HH:mm น.")}
                         </span>
                       </div>
 
@@ -350,7 +324,7 @@ export default function ClientProjectView() {
                                   {update.description}
                                 </p>
                                 <p className="mt-1 text-sm text-stone-500">
-                                  {format(new Date(update.uploadedAt), "d MMM yyyy HH:mm")}
+                                  {safeFormatDate(update.uploadedAt, "d MMM yyyy HH:mm")}
                                 </p>
                                 {update.images && update.images.length > 0 && (
                                   <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4">
@@ -471,22 +445,11 @@ function DateInfo({
       <div>
         <p className="text-sm text-stone-500">{label}</p>
         <p className="font-medium text-stone-950">
-          {value ? format(new Date(value), "d MMM yyyy") : "ไม่ระบุ"}
+          {safeFormatDate(value, "d MMM yyyy")}
         </p>
       </div>
     </div>
   );
 }
 
-function getStatusBadgeClass(status: string) {
-  switch (status) {
-    case "เสร็จแล้ว":
-      return "bg-emerald-50 text-emerald-700 border-emerald-200";
-    case "รอตรวจ":
-      return "bg-sky-50 text-sky-700 border-sky-200";
-    case "ปฏิบัติงาน":
-      return "bg-amber-50 text-amber-700 border-amber-200 font-semibold animate-pulse";
-    default: // ยังไม่เริ่ม
-      return "bg-stone-50 text-stone-500 border-stone-200";
-  }
-}
+

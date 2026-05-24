@@ -51,7 +51,14 @@ export default function Home() {
       return;
     }
 
-    setLocation(`/project/${code.trim().toUpperCase()}`);
+    const trimmedCode = code.trim().toUpperCase();
+    const ACCESS_CODE_REGEX = /^[A-Z0-9]{8}$/;
+    if (!ACCESS_CODE_REGEX.test(trimmedCode)) {
+      setError("รหัสโครงการต้องเป็นตัวอักษรและตัวเลข 8 หลัก");
+      return;
+    }
+
+    setLocation(`/project/${trimmedCode}`);
     setIsAccessDialogOpen(false);
   };
 

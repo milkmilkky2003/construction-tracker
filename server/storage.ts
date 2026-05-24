@@ -112,3 +112,72 @@ export async function storageGetSignedUrl(relKey: string): Promise<string> {
   const { signedURL } = (await resp.json()) as { signedURL: string };
   return `${url}${signedURL}`;
 }
+
+export function extractKeyFromUrl(input: string): string {
+  if (!input) return "";
+  if (!input.startsWith("http://") && !input.startsWith("https://")) {
+    return input; // Already a relative key
+  }
+  
+  try {
+    const { bucket } = getSupabaseConfig();
+    // Find "/storage/v1/object/public/bucketName/" or "/storage/v1/object/sign/bucketName/"
+    const publicPrefix = `/storage/v1/object/public/${bucket}/`;
+    const signPrefix = `/storage/v1/object/sign/${bucket}/`;
+    
+    let index = input.indexOf(publicPrefix);
+    if (index !== -1) {
+      const rawPath = input.substring(index + publicPrefix.length);
+      return decodeURIComponent(rawPath);
+    }
+    
+    index = input.indexOf(signPrefix);
+    if (index !== -1) {
+      const rawPath = input.substring(index + signPrefix.length);
+      return decodeURIComponent(rawPath);
+    }
+    
+    // Fallback: search for last parts or decode URL path
+    const parsedUrl = new URL(input);
+    const decodedPath = decodeURIComponent(parsedUrl.pathname);
+    const bucketSearch = `/${bucket}/`;
+    const bucketIndex = decodedPath.indexOf(bucketSearch);
+    if (bucketIndex !== -1) {
+      return decodedPath.substring(bucketIndex + bucketSearch.length);
+    }
+  } catch (e) {
+    // Ignore error
+  }
+  
+  return input; // Fallback
+}
+
+export async function storageDelete(relKey: string): Promise<void> {
+  if (!relKey) return;
+  const key = normalizeKey(extractKeyFromUrl(relKey));
+  const { url, key: serviceRoleKey, bucket } = getSupabaseConfig();
+  
+  const deleteUrl = `${url}/storage/v1/object/remove`;
+  
+  try {
+    const resp = await fetch(deleteUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${serviceRoleKey}`,
+        apikey: serviceRoleKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        bucket,
+        prefixes: [key],
+      }),
+    });
+
+    if (!resp.ok) {
+      const msg = await resp.text().catch(() => resp.statusText);
+      console.warn(`Supabase storage delete warning (${resp.status}): ${msg}`);
+    }
+  } catch (err) {
+    console.warn(`Supabase storage delete network warning:`, err);
+  }
+}

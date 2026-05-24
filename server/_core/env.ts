@@ -3,7 +3,12 @@ import "dotenv/config";
 const isProduction = process.env.NODE_ENV === "production";
 
 export const ENV = {
-  cookieSecret: process.env.JWT_SECRET ?? (isProduction ? "" : "local-dev-jwt-secret"),
+  cookieSecret: process.env.JWT_SECRET ?? (() => {
+    if (isProduction) {
+      throw new Error("JWT_SECRET environment variable is required in production");
+    }
+    return "local-dev-jwt-secret";
+  })(),
   databaseUrl: process.env.DATABASE_URL ?? "",
   adminUserId: Number(process.env.ADMIN_USER_ID ?? "1"),
   adminUsername: process.env.ADMIN_USERNAME ?? (isProduction ? "" : "admin"),

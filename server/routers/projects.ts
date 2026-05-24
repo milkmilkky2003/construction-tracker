@@ -72,7 +72,7 @@ export const projectsRouter = router({
     .input(
       z.object({
         name: z.string().min(1, "Project name is required"),
-        description: z.string().optional(),
+        description: z.string().max(5000).optional(),
         startDate: z.date().optional(),
         endDate: z.date().optional(),
         hasStructure: z.boolean(),
@@ -81,6 +81,15 @@ export const projectsRouter = router({
         structureWeight: z.number(),
         systemsWeight: z.number(),
         interiorWeight: z.number(),
+      }).refine((data) => {
+        const sum = 
+          (data.hasStructure ? data.structureWeight : 0) +
+          (data.hasSystems ? data.systemsWeight : 0) +
+          (data.hasInterior ? data.interiorWeight : 0);
+        return sum === 100;
+      }, {
+        message: "สัดส่วนน้ำหนักรวมของหมวดงานที่เปิดใช้งานต้องเท่ากับ 100%",
+        path: ["structureWeight"],
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -110,7 +119,7 @@ export const projectsRouter = router({
       z.object({
         projectId: z.number(),
         name: z.string().optional(),
-        description: z.string().optional(),
+        description: z.string().max(5000).optional(),
         startDate: z.date().optional(),
         endDate: z.date().optional(),
         progressPercentage: z.string().optional(),
@@ -132,6 +141,35 @@ export const projectsRouter = router({
       const project = await getProjectById(input.projectId);
       if (!project) throw new Error("Project not found");
       if (project.ownerId !== ctx.user.id) throw new Error("Unauthorized");
+
+      // Merge input with existing project to validate weight constraints
+      const hasStructure = input.hasStructure !== undefined ? input.hasStructure : project.hasStructure;
+      const hasSystems = input.hasSystems !== undefined ? input.hasSystems : project.hasSystems;
+      const hasInterior = input.hasInterior !== undefined ? input.hasInterior : project.hasInterior;
+
+      const structureWeight = input.structureWeight !== undefined ? input.structureWeight : (project.structureWeight ?? 0);
+      const systemsWeight = input.systemsWeight !== undefined ? input.systemsWeight : (project.systemsWeight ?? 0);
+      const interiorWeight = input.interiorWeight !== undefined ? input.interiorWeight : (project.interiorWeight ?? 0);
+
+      if (!hasStructure && !hasSystems && !hasInterior) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "ต้องเลือกหมวดงานอย่างน้อย 1 หมวด",
+        });
+      }
+
+      const sum = 
+        (hasStructure ? structureWeight : 0) +
+        (hasSystems ? systemsWeight : 0) +
+        (hasInterior ? interiorWeight : 0);
+
+      if (sum !== 100) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "สัดส่วนน้ำหนักรวมของหมวดงานที่เปิดใช้งานต้องเท่ากับ 100%",
+        });
+      }
+
       await updateProject(input.projectId, {
         name: input.name,
         description: input.description,
@@ -204,7 +242,7 @@ export const projectsRouter = router({
       z.object({
         projectId: z.number(),
         category: z.enum(["Structure", "Systems", "Interior Finishing"]),
-        description: z.string(),
+        description: z.string().max(5000),
         imageUrls: z.array(z.string()).optional(),
         images: z.array(uploadImageInput).optional(),
       })
@@ -223,7 +261,6 @@ export const projectsRouter = router({
       });
 
       const updateId = update.id;
-      const imageUrls = [...(input.imageUrls ?? [])];
 
       for (const image of input.images ?? []) {
         const { contentType, buffer } = imageDataUrlToBuffer(image.dataUrl);
@@ -236,14 +273,19 @@ export const projectsRouter = router({
           buffer,
           image.contentType || contentType,
         );
-        imageUrls.push(stored.url);
+        
+        await createUpdateImage({
+          updateId,
+          imageUrl: stored.url,
+          imageKey: stored.key,
+        });
       }
 
-      for (const imageUrl of imageUrls) {
+      for (const imageUrl of input.imageUrls ?? []) {
         await createUpdateImage({
           updateId,
           imageUrl,
-          imageKey: imageUrl, // Use URL as key for reference
+          imageKey: imageUrl,
         });
       }
 
@@ -256,7 +298,7 @@ export const projectsRouter = router({
       z.object({
         updateId: z.number(),
         category: z.enum(["Structure", "Systems", "Interior Finishing"]).optional(),
-        description: z.string().optional(),
+        description: z.string().max(5000).optional(),
         deleteImageIds: z.array(z.number()).optional(),
         images: z.array(uploadImageInput).optional(),
       })
@@ -299,7 +341,7 @@ export const projectsRouter = router({
           await createUpdateImage({
             updateId: input.updateId,
             imageUrl: stored.url,
-            imageKey: stored.url,
+            imageKey: stored.key,
           });
         }
       }
