@@ -70,15 +70,18 @@ export default function Home() {
         <header className="flex items-center justify-between px-5 py-5 sm:px-8 lg:px-12 xl:px-16">
           <button
             onClick={() => setLocation("/")}
-            className="text-left leading-none"
+            className="flex items-center gap-3 text-left leading-none"
             aria-label="กลับหน้าแรก"
           >
-            <span className="block text-sm font-semibold uppercase tracking-[0.34em] text-[#6d604f]">
-              Siwakit
-            </span>
-            <span className="mt-1 block text-xs uppercase tracking-[0.28em] text-[#b29c81]">
-              Group
-            </span>
+            <img src="/LogoNew.png" className="h-10 w-10 object-contain rounded-sm" alt="Siwakit Logo" />
+            <div>
+              <span className="block text-sm font-semibold uppercase tracking-[0.34em] text-[#6d604f]">
+                Siwakit
+              </span>
+              <span className="mt-1 block text-xs uppercase tracking-[0.28em] text-[#b29c81]">
+                Group
+              </span>
+            </div>
           </button>
 
           <Button

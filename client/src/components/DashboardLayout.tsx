@@ -156,9 +156,7 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#d7c7b5] text-sm font-semibold text-[#8b7660]">
-                    S
-                  </div>
+                  <img src="/LogoNew.png" className="h-10 w-10 shrink-0 object-contain rounded-full border border-[#d7c7b5]" alt="Siwakit Logo" />
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold uppercase leading-tight tracking-[0.18em] text-[#6d604f]">
                       SIWAKIT GROUP

@@ -109,7 +109,10 @@ export default function AdminLogin() {
           {/* Frosted Glass login container */}
           <div className="relative z-10 w-full max-w-md rounded-[8px] border border-white/25 bg-white/80 p-6 md:p-8 shadow-[0_24px_64px_-16px_rgba(75,60,42,0.3)] backdrop-blur-md">
             <div className="mb-7 text-left">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#a58762]">Admin Console</p>
+              <div className="mb-3 flex items-center gap-2">
+                <img src="/LogoNew.png" className="h-8 w-8 object-contain rounded-sm" alt="Siwakit Logo" />
+                <span className="text-xs font-semibold uppercase tracking-[0.24em] text-[#a58762]">Admin Console</span>
+              </div>
               <h2 className="mt-2 text-3xl font-semibold text-[#2c241c]">
                 เข้าสู่ระบบ
               </h2>

@@ -418,9 +418,7 @@ function Header({ title, onBack }: { title: string; onBack: () => void }) {
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-orange-600 text-sm font-semibold text-white">
-          S
-        </div>
+        <img src="/LogoNew.png" className="h-10 w-10 shrink-0 object-contain rounded-md border border-stone-200" alt="Siwakit Logo" />
         <div className="min-w-0">
           <p className="truncate font-semibold text-stone-950">{title}</p>
           <p className="text-xs text-stone-500">SIWAKIT GROUP</p>
