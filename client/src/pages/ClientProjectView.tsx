@@ -295,10 +295,7 @@ export default function ClientProjectView() {
                             {status}
                           </span>
                         </div>
-                        <p className="mt-3 font-semibold text-stone-950 text-base">
-                          {meta.subtitle}
-                        </p>
-                        <p className="mt-1 text-xs text-stone-500 font-medium">
+                        <p className="mt-2 text-xs text-stone-500 font-medium">
                           รายงานอัปเดต {categoryUpdates.length} รายการ
                         </p>
                       </div>
